@@ -8,6 +8,13 @@ import Register from './pages/Register'
 import Favourites from './pages/Favourites'
 import Compare from './pages/Compare'
 import AdminDashboard from './pages/AdminDashboard'
+import AdminLogin from './pages/AdminLogin'
+import AdminInventory from './pages/AdminInventory'
+import AdminEnquiries from './pages/AdminEnquiries'
+
+function AdminRoute({ children }) {
+  return window.localStorage.getItem('carventory-admin-session') === 'true' ? children : <Navigate to="/admin/login" replace />
+}
 
 export default function App() {
   return (
@@ -20,7 +27,12 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/favourites" element={<Favourites />} />
         <Route path="/compare" element={<Compare />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+        <Route path="/admin/inventory" element={<AdminRoute><AdminInventory /></AdminRoute>} />
+        <Route path="/admin/cars/new" element={<AdminRoute><AdminInventory /></AdminRoute>} />
+        <Route path="/admin/cars/:carId/edit" element={<AdminRoute><AdminInventory /></AdminRoute>} />
+        <Route path="/admin/enquiries" element={<AdminRoute><AdminEnquiries /></AdminRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
