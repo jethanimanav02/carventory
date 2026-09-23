@@ -1,0 +1,483 @@
+{
+  "info": {
+    "_postman_id": "c4a7e930-4e2a-4a2e-8a1e-8e5f3c9e1024",
+    "name": "Carventory - Experiment 4",
+    "description": "Experiment 4 REST API collection for Carventory using Spring Boot, Spring Data MongoDB, and MongoDB.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "carId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. GET All Cars",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Response is an array of cars\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(Array.isArray(jsonData)).to.be.true;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/cars",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "cars"]
+        },
+        "description": "Retrieve all cars stored in MongoDB carventory.cars collection."
+      }
+    },
+    {
+      "name": "2. POST Create Car",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201 Created\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Response has generated MongoDB ID\", function () {",
+              "    pm.expect(jsonData.id).to.be.a('string');",
+              "    pm.expect(jsonData.id.length).to.be.greaterThan(0);",
+              "});",
+              "if (jsonData.id) {",
+              "    pm.collectionVariables.set(\"carId\", jsonData.id);",
+              "    console.log(\"Saved created carId:\", jsonData.id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"brand\": \"Maruti\",\n  \"model\": \"Swift\",\n  \"variant\": \"ZXI\",\n  \"year\": 2023,\n  \"price\": 750000,\n  \"kmDriven\": 15000,\n  \"fuel\": \"Petrol\",\n  \"transmission\": \"Manual\",\n  \"engine\": \"1197 cc\",\n  \"color\": \"Red\",\n  \"numberOfOwners\": 1,\n  \"location\": \"Ulhasnagar, Maharashtra\",\n  \"description\": \"Test car created for Experiment 4.\",\n  \"photos\": [],\n  \"features\": [\n    \"Touchscreen\",\n    \"Rear Camera\"\n  ],\n  \"status\": \"AVAILABLE\",\n  \"condition\": \"USED\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/cars",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "cars"]
+        },
+        "description": "Create a new car document in MongoDB and store the generated ID."
+      }
+    },
+    {
+      "name": "3. GET Car By ID",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Returned car matches requested ID\", function () {",
+              "    pm.expect(jsonData.brand).to.eql(\"Maruti\");",
+              "    pm.expect(jsonData.model).to.eql(\"Swift\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/cars/{{carId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "cars", "{{carId}}"]
+        },
+        "description": "Fetch a specific car document by its MongoDB ID."
+      }
+    },
+    {
+      "name": "4. PUT Update Car",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Car updated price and description verified\", function () {",
+              "    pm.expect(jsonData.price).to.eql(725000);",
+              "    pm.expect(jsonData.description).to.eql(\"Updated test car for Experiment 4.\");",
+              "    pm.expect(jsonData.features).to.include(\"Alloy Wheels\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"brand\": \"Maruti\",\n  \"model\": \"Swift\",\n  \"variant\": \"ZXI\",\n  \"year\": 2023,\n  \"price\": 725000,\n  \"kmDriven\": 15000,\n  \"fuel\": \"Petrol\",\n  \"transmission\": \"Manual\",\n  \"engine\": \"1197 cc\",\n  \"color\": \"Red\",\n  \"numberOfOwners\": 1,\n  \"location\": \"Ulhasnagar, Maharashtra\",\n  \"description\": \"Updated test car for Experiment 4.\",\n  \"photos\": [],\n  \"features\": [\n    \"Touchscreen\",\n    \"Rear Camera\",\n    \"Alloy Wheels\"\n  ],\n  \"status\": \"AVAILABLE\",\n  \"condition\": \"USED\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/cars/{{carId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "cars", "{{carId}}"]
+        },
+        "description": "Update the price, description, and features of the created car."
+      }
+    },
+    {
+      "name": "5. DELETE Car",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 204 No Content\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/cars/{{carId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "cars", "{{carId}}"]
+        },
+        "description": "Delete the test car from MongoDB."
+      }
+    },
+    {
+      "name": "6. GET Deleted Car (Verify 404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 404 Not Found\", function () {",
+              "    pm.response.to.have.status(404);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/cars/{{carId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "cars", "{{carId}}"]
+        },
+        "description": "Verify that fetching the deleted car returns 404 Not Found."
+      }
+    },
+    {
+      "name": "7. Filter - By Fuel (Petrol)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"All returned cars have fuel Petrol\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    jsonData.forEach(function(car) {",
+              "        pm.expect(car.fuel.toLowerCase()).to.eql(\"petrol\");",
+              "    });",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/cars?fuel=Petrol",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "cars"],
+          "query": [
+            {
+              "key": "fuel",
+              "value": "Petrol"
+            }
+          ]
+        },
+        "description": "Filter cars by fuel type Petrol."
+      }
+    },
+    {
+      "name": "8. Filter - By Transmission (Automatic)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"All returned cars have transmission Automatic\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    jsonData.forEach(function(car) {",
+              "        pm.expect(car.transmission.toLowerCase()).to.eql(\"automatic\");",
+              "    });",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/cars?transmission=Automatic",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "cars"],
+          "query": [
+            {
+              "key": "transmission",
+              "value": "Automatic"
+            }
+          ]
+        },
+        "description": "Filter cars by Automatic transmission."
+      }
+    },
+    {
+      "name": "9. Filter - By Min Price",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"All returned cars price >= 500000\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    jsonData.forEach(function(car) {",
+              "        pm.expect(car.price).to.be.at.least(500000);",
+              "    });",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/cars?minPrice=500000",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "cars"],
+          "query": [
+            {
+              "key": "minPrice",
+              "value": "500000"
+            }
+          ]
+        },
+        "description": "Filter cars with minimum price 500000."
+      }
+    },
+    {
+      "name": "10. Filter Combination - Fuel & Min Price",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Cars match both Petrol and price >= 500000\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    jsonData.forEach(function(car) {",
+              "        pm.expect(car.fuel.toLowerCase()).to.eql(\"petrol\");",
+              "        pm.expect(car.price).to.be.at.least(500000);",
+              "    });",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/cars?fuel=Petrol&minPrice=500000",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "cars"],
+          "query": [
+            {
+              "key": "fuel",
+              "value": "Petrol"
+            },
+            {
+              "key": "minPrice",
+              "value": "500000"
+            }
+          ]
+        },
+        "description": "Filter combination: Petrol fuel AND price >= 500000."
+      }
+    },
+    {
+      "name": "11. Invalid Request - Validation Failure",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400 Bad Request\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Error response contains field errors\", function () {",
+              "    pm.expect(jsonData.status).to.eql(400);",
+              "    pm.expect(jsonData.fieldErrors).to.be.an('object');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"brand\": \"\",\n  \"model\": \"\",\n  \"price\": -100\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/cars",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "cars"]
+        },
+        "description": "Send invalid payload with blank fields and negative price to verify 400 Bad Request."
+      }
+    },
+    {
+      "name": "12. Non-existing Car (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 404 Not Found\", function () {",
+              "    pm.response.to.have.status(404);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/cars/665f1a2b3c4d5e6f7a8b9c0d",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "cars", "665f1a2b3c4d5e6f7a8b9c0d"]
+        },
+        "description": "Verify 404 Not Found response when querying a non-existent MongoDB ObjectId."
+      }
+    }
+  ]
+}

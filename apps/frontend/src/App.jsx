@@ -11,9 +11,11 @@ import AdminDashboard from './pages/AdminDashboard'
 import AdminLogin from './pages/AdminLogin'
 import AdminInventory from './pages/AdminInventory'
 import AdminEnquiries from './pages/AdminEnquiries'
+import { useAuth } from './context/AuthContext'
 
 function AdminRoute({ children }) {
-  return window.localStorage.getItem('carventory-admin-session') === 'true' ? children : <Navigate to="/admin/login" replace />
+  const { isAuthenticated } = useAuth()
+  return isAuthenticated ? children : <Navigate to="/admin/login" replace />
 }
 
 export default function App() {

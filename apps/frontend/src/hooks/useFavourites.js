@@ -6,5 +6,5 @@ export default function useFavourites(cars = []) {
   const toggleFavourite = useCallback((id) => setFavouriteIds(current => current.includes(id) ? current.filter(item => item !== id) : [...current, id]), [setFavouriteIds])
   const isFavourite = useCallback((id) => favouriteIds.includes(id), [favouriteIds])
   const favouriteCars = useMemo(() => cars.filter(car => favouriteIds.includes(car.id)), [cars, favouriteIds])
-  return { favouriteIds, favouriteCars, toggleFavourite, isFavourite }
+  return { favouriteIds, favouriteCars, toggleFavourite, isFavourite, setFavouriteIds }
 }

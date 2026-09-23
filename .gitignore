@@ -1,0 +1,23 @@
+# Build outputs
+target/
+dist/
+build/
+
+# Node modules
+node_modules/
+
+# Environment files & secrets
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+backend-error.log
+
+# IDE & Editor files
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db

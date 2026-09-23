@@ -9,5 +9,5 @@ export default function useCompare() {
     if (current.includes(id)) return current.filter(item => item !== id)
     return current.length < MAX_COMPARE ? [...current, id] : current
   }), [setCompareIds])
-  return { compareIds, toggleCompare, isComparing: id => compareIds.includes(id), canAdd: compareIds.length < MAX_COMPARE }
+  return { compareIds, toggleCompare, isComparing: id => compareIds.includes(id), canAdd: compareIds.length < MAX_COMPARE, setCompareIds }
 }

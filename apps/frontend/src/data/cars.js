@@ -79,6 +79,30 @@ export const cars = [
     description: 'A nearly-new, seven-seat flagship with serious road presence and a thoughtful tech suite.',
     features: ['ADAS Level 2', 'Panoramic skyroof', 'Sony 3D audio', '7 airbags'],
   },
+  {
+    id: 'seltos-gtx-2023', brand: 'Kia', model: 'Seltos', variant: 'GTX+ 1.5 Turbo DCT', year: 2023,
+    price: 1795000, kmDriven: 19600, fuel: 'Petrol', transmission: 'Automatic', engine: '1482 cc',
+    color: 'Aurora Black Pearl', owners: 1, location: 'Jubilee Hills, Hyderabad', condition: 'USED', status: 'AVAILABLE',
+    image: 'https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=1200&q=85',
+    description: 'A sharp, feature-rich Seltos with low kilometres, a clean history and the kind of cabin that makes every commute feel considered.',
+    features: ['Panoramic sunroof', 'ADAS', 'Bose audio', 'Ventilated seats'],
+  },
+  {
+    id: 'fortuner-4x2-2022', brand: 'Toyota', model: 'Fortuner', variant: '4x2 AT Diesel', year: 2022,
+    price: 3240000, kmDriven: 41200, fuel: 'Diesel', transmission: 'Automatic', engine: '2755 cc',
+    color: 'Super White', owners: 1, location: 'Gachibowli, Hyderabad', condition: 'USED', status: 'AVAILABLE',
+    image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=1200&q=85',
+    description: 'A dependable long-distance companion with a commanding view, complete service records and effortless automatic cruising.',
+    features: ['7 seats', 'Cruise control', 'Rear camera', 'Leather interior'],
+  },
+  {
+    id: 'jimny-alpha-2024', brand: 'Maruti Suzuki', model: 'Jimny', variant: 'Alpha AT', year: 2024,
+    price: 1425000, kmDriven: 6800, fuel: 'Petrol', transmission: 'Automatic', engine: '1462 cc',
+    color: 'Granite Grey', owners: 1, location: 'Hitech City, Hyderabad', condition: 'USED', status: 'AVAILABLE',
+    image: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1200&q=85',
+    description: 'A practically new Jimny with a compact footprint, genuine four-wheel-drive character and plenty of weekend potential.',
+    features: ['4WD', 'Touchscreen infotainment', 'LED headlamps', 'Six airbags'],
+  },
 ]
 
 export const formatPrice = (price) => `₹${(price / 100000).toFixed(2)} Lakh`

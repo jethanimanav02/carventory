@@ -1,8 +1,11 @@
 import { useMemo, useState } from 'react'
+import { useCarsContext } from '../context/CarContext'
 
 const defaultFilters = { search: '', condition: 'ALL', fuel: 'ALL', transmission: 'ALL', location: 'ALL', year: 'ALL', maxPrice: 'ALL' }
 
-export default function useCarFilters(cars) {
+export default function useCarFilters(sourceCars) {
+  const { publicCars } = useCarsContext()
+  const cars = sourceCars || publicCars
   const [filters, setFilters] = useState(defaultFilters)
   const [sortBy, setSortBy] = useState('recommended')
 
