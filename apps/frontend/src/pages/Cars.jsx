@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import CarCard from '../components/CarCard'
-import Icon from '../components/Icons'
 import useCarFilters from '../hooks/useCarFilters'
 import { useCarsContext } from '../context/CarContext'
 
@@ -9,13 +8,235 @@ export default function Cars() {
   const [searchParams] = useSearchParams()
   const [view, setView] = useState('grid')
   const { loading, error } = useCarsContext()
-  const { filters, updateFilter, clearFilters, sortBy, setSortBy, visibleCars, options, hasFilters } = useCarFilters()
-  useEffect(() => { if (searchParams.get('search')) updateFilter('search', searchParams.get('search')) }, [searchParams])
-  if (loading) return <div className="api-state container"><h1>Loading cars...</h1><p>Fetching latest inventory from database.</p></div>
-  if (error) return <div className="api-state container"><h1>Unable to load cars. Please try again.</h1><p>{error}</p></div>
-  return <div className="page-shell"><section className="page-hero container"><div><p className="kicker">THE COLLECTION</p><h1>Find your <em>next car.</em></h1><p>Browse our verified car inventory with full specifications and photos.</p></div><div className="inventory-count"><strong>{visibleCars.length}</strong><span>cars<br />available</span></div></section><section className="container inventory-layout"><aside className="filter-rail"><p className="eyebrow">REFINE BY</p><label className="filter-search"><Icon name="search" size={16} /><input value={filters.search} onChange={event => updateFilter('search', event.target.value)} placeholder="Search cars" /></label><FilterSelect label="Condition" name="condition" value={filters.condition} onChange={updateFilter} options={['ALL', 'NEW', 'USED']} /><FilterSelect label="Fuel type" name="fuel" value={filters.fuel} onChange={updateFilter} options={['ALL', ...options.fuels]} /><FilterSelect label="Transmission" name="transmission" value={filters.transmission} onChange={updateFilter} options={['ALL', 'Automatic', 'Manual']} /><FilterSelect label="Location" name="location" value={filters.location} onChange={updateFilter} options={['ALL', ...options.locations]} /><FilterSelect label="Year" name="year" value={filters.year} onChange={updateFilter} options={['ALL', ...options.years]} /><FilterSelect label="Max price" name="maxPrice" value={filters.maxPrice} onChange={updateFilter} options={[['ALL', 'Any price'], [1000000, '₹10 lakh'], [1500000, '₹15 lakh'], [2000000, '₹20 lakh'], [3000000, '₹30 lakh']]} />{hasFilters && <button className="clear-filters" onClick={clearFilters}>Clear all filters</button>}</aside><div className="inventory-results"><div className="results-toolbar"><span><strong>{visibleCars.length} cars</strong> found</span><div className="toolbar-actions"><button className={view === 'grid' ? 'selected' : ''} onClick={() => setView('grid')}>Grid</button><button className={view === 'list' ? 'selected' : ''} onClick={() => setView('list')}>List</button><select className="sort-button" value={sortBy} onChange={event => setSortBy(event.target.value)}><option value="recommended">Sort: Recommended</option><option value="priceAsc">Price: Low → High</option><option value="priceDesc">Price: High → Low</option><option value="yearDesc">Year: Newest</option><option value="yearAsc">Year: Oldest</option><option value="kmAsc">KM: Low → High</option></select></div></div>{visibleCars.length ? <div className={`car-grid ${view === 'list' ? 'list-view' : ''}`}>{visibleCars.map(car => <CarCard key={car.id} car={car} />)}</div> : <div className="no-results"><Icon name="search" size={26} /><h3>No cars found.</h3><p>Try clearing your filters or search terms.</p><button className="text-link" onClick={clearFilters}>Clear filters <Icon name="arrow" size={15} /></button></div>}</div></section></div>
-}
+  const {
+    filters,
+    updateFilter,
+    clearFilters,
+    sortBy,
+    setSortBy,
+    visibleCars,
+    options,
+    hasFilters
+  } = useCarFilters()
 
-function FilterSelect({ label, name, value, onChange, options }) {
-  return <label className="filter-select"><span>{label}</span><select value={value} onChange={event => onChange(name, event.target.value)}>{options.map(option => { const [optionValue, optionLabel] = Array.isArray(option) ? option : [option, option === 'ALL' ? `All ${label.toLowerCase()}` : option]; return <option key={optionValue} value={optionValue}>{optionLabel}</option> })}</select></label>
+  useEffect(() => {
+    if (searchParams.get('search')) {
+      updateFilter('search', searchParams.get('search'))
+    }
+  }, [searchParams])
+
+  if (loading) {
+    return (
+      <div className="container" style={{ padding: '40px 16px', textAlign: 'center' }}>
+        <h2>Loading inventory...</h2>
+        <p className="subtext">Fetching cars from database.</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="container" style={{ padding: '40px 16px' }}>
+        <div className="status-banner status-banner-error">
+          Unable to load cars. Make sure the backend server is running.
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="container" style={{ paddingTop: '20px', paddingBottom: '40px' }}>
+      {/* Header */}
+      <div style={{ marginBottom: '20px' }}>
+        <h1>Car Inventory</h1>
+        <p className="subtext" style={{ margin: 0 }}>
+          Search and filter verified vehicles ({visibleCars.length} available)
+        </p>
+      </div>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+          gap: '24px',
+          alignItems: 'start'
+        }}
+      >
+        {/* Filters Sidebar */}
+        <aside className="card" style={{ padding: '16px' }}>
+          <h3 style={{ fontSize: '15px', borderBottom: '1px solid #e2e8f0', paddingBottom: '8px', marginBottom: '14px' }}>
+            Filter Inventory
+          </h3>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="filter-search">Search</label>
+            <input
+              id="filter-search"
+              type="text"
+              className="form-input"
+              value={filters.search}
+              onChange={(e) => updateFilter('search', e.target.value)}
+              placeholder="Brand, model, or variant..."
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Condition</label>
+            <select
+              className="form-select"
+              value={filters.condition}
+              onChange={(e) => updateFilter('condition', e.target.value)}
+            >
+              <option value="ALL">All Conditions</option>
+              <option value="NEW">New</option>
+              <option value="USED">Used</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Fuel Type</label>
+            <select
+              className="form-select"
+              value={filters.fuel}
+              onChange={(e) => updateFilter('fuel', e.target.value)}
+            >
+              <option value="ALL">All Fuel Types</option>
+              {options.fuels.map((fuel) => (
+                <option key={fuel} value={fuel}>{fuel}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Transmission</label>
+            <select
+              className="form-select"
+              value={filters.transmission}
+              onChange={(e) => updateFilter('transmission', e.target.value)}
+            >
+              <option value="ALL">All Transmissions</option>
+              <option value="Automatic">Automatic</option>
+              <option value="Manual">Manual</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Location</label>
+            <select
+              className="form-select"
+              value={filters.location}
+              onChange={(e) => updateFilter('location', e.target.value)}
+            >
+              <option value="ALL">All Locations</option>
+              {options.locations.map((loc) => (
+                <option key={loc} value={loc}>{loc}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Max Price</label>
+            <select
+              className="form-select"
+              value={filters.maxPrice}
+              onChange={(e) => updateFilter('maxPrice', e.target.value)}
+            >
+              <option value="ALL">Any Price</option>
+              <option value="1000000">Up to ₹10 Lakh</option>
+              <option value="1500000">Up to ₹15 Lakh</option>
+              <option value="2000000">Up to ₹20 Lakh</option>
+              <option value="3000000">Up to ₹30 Lakh</option>
+            </select>
+          </div>
+
+          {hasFilters && (
+            <button
+              type="button"
+              className="btn btn-outline btn-sm"
+              onClick={clearFilters}
+              style={{ width: '100%', marginTop: '6px' }}
+            >
+              Clear All Filters
+            </button>
+          )}
+        </aside>
+
+        {/* Results Area */}
+        <main style={{ gridColumn: 'span 2' }}>
+          {/* Toolbar */}
+          <div
+            className="card"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '12px',
+              padding: '10px 14px',
+              marginBottom: '16px'
+            }}
+          >
+            <div style={{ fontSize: '13px', color: '#475569' }}>
+              Showing <strong>{visibleCars.length}</strong> of <strong>{visibleCars.length}</strong> cars
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <select
+                className="form-select"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                style={{ width: 'auto', padding: '5px 10px', fontSize: '13px' }}
+              >
+                <option value="recommended">Sort: Default</option>
+                <option value="priceAsc">Price: Low to High</option>
+                <option value="priceDesc">Price: High to Low</option>
+                <option value="yearDesc">Year: Newest First</option>
+                <option value="kmAsc">KM: Low to High</option>
+              </select>
+
+              <button
+                type="button"
+                className={`btn btn-sm ${view === 'grid' ? 'btn-primary' : 'btn-outline'}`}
+                onClick={() => setView('grid')}
+              >
+                Grid
+              </button>
+              <button
+                type="button"
+                className={`btn btn-sm ${view === 'list' ? 'btn-primary' : 'btn-outline'}`}
+                onClick={() => setView('list')}
+              >
+                List
+              </button>
+            </div>
+          </div>
+
+          {/* Car Grid / List */}
+          {visibleCars.length === 0 ? (
+            <div className="card" style={{ textAlign: 'center', padding: '40px 20px' }}>
+              <h3>No cars found</h3>
+              <p className="subtext">
+                No vehicles matched your filter settings. Try clearing some filters.
+              </p>
+              <button type="button" className="btn btn-primary btn-sm" onClick={clearFilters}>
+                Reset Filters
+              </button>
+            </div>
+          ) : (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: view === 'list' ? '1fr' : 'repeat(auto-fill, minmax(240px, 1fr))',
+                gap: '16px'
+              }}
+            >
+              {visibleCars.map((car) => (
+                <CarCard key={car.id} car={car} />
+              ))}
+            </div>
+          )}
+        </main>
+      </div>
+    </div>
+  )
 }

@@ -1,9 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import AdminNav from '../components/AdminNav'
-import Button from '../components/Button'
 import CarForm from '../components/CarForm'
-import Icon from '../components/Icons'
 import { formatPrice } from '../data/cars'
 import { useCarsContext } from '../context/CarContext'
 
@@ -18,7 +16,10 @@ export default function AdminInventory() {
   const [actionStatus, setActionStatus] = useState('')
   const [actionError, setActionError] = useState('')
 
-  const selectedCar = useMemo(() => cars.find(car => String(car.id) === String(carId)), [cars, carId])
+  const selectedCar = useMemo(
+    () => cars.find((car) => String(car.id) === String(carId)),
+    [cars, carId]
+  )
 
   const save = async (car) => {
     setActionStatus('Saving...')
@@ -51,31 +52,48 @@ export default function AdminInventory() {
     }
   }
 
+  // Handle Add / Edit form screen
   if (creating || editing) {
     return (
-      <div className="admin-page admin-page-inner">
-        <div className="container">
-          <AdminNav />
-          <div className="admin-form-top">
-            <div>
-              <Link to="/admin/inventory" className="back-link">← Back to Inventory</Link>
-              <p className="kicker">{editing ? 'EDIT LISTING' : 'NEW LISTING'}</p>
-              <h1>{editing ? <>Update <em>{selectedCar?.brand} {selectedCar?.model || 'car'}.</em></> : <>Add a <em>new car.</em></>}</h1>
-            </div>
-          </div>
-          {actionStatus && <div className="admin-status-banner">{actionStatus}</div>}
-          {actionError && <div className="admin-error-banner">{actionError}</div>}
-          {editing && !selectedCar ? (
-            <div className="admin-empty">This car was not found in inventory.</div>
-          ) : (
-            <CarForm initialCar={selectedCar} onSave={save} onCancel={() => navigate('/admin/inventory')} />
-          )}
+      <div className="container" style={{ paddingTop: '20px', paddingBottom: '40px' }}>
+        <AdminNav />
+
+        <div style={{ marginBottom: '20px' }}>
+          <Link to="/admin/inventory" className="btn btn-sm btn-outline" style={{ marginBottom: '12px' }}>
+            ← Back to Inventory Table
+          </Link>
+          <h1>{editing ? `Edit Car: ${selectedCar?.brand || ''} ${selectedCar?.model || ''}` : 'Add New Car to Inventory'}</h1>
+          <p className="subtext" style={{ margin: 0 }}>
+            {editing ? 'Update vehicle specifications in the database' : 'Enter car details to list in dealership inventory'}
+          </p>
         </div>
+
+        {actionStatus && (
+          <div className="status-banner status-banner-info">{actionStatus}</div>
+        )}
+        {actionError && (
+          <div className="status-banner status-banner-error">{actionError}</div>
+        )}
+
+        {editing && !selectedCar ? (
+          <div className="card" style={{ padding: '30px', textAlign: 'center' }}>
+            <p>Car not found in inventory.</p>
+            <Link to="/admin/inventory" className="btn btn-primary btn-sm">
+              Back to Inventory
+            </Link>
+          </div>
+        ) : (
+          <CarForm
+            initialCar={selectedCar}
+            onSave={save}
+            onCancel={() => navigate('/admin/inventory')}
+          />
+        )}
       </div>
     )
   }
 
-  const filteredCars = cars.filter(car =>
+  const filteredCars = cars.filter((car) =>
     [car.brand, car.model, car.variant, car.location]
       .join(' ')
       .toLowerCase()
@@ -83,69 +101,152 @@ export default function AdminInventory() {
   )
 
   return (
-    <div className="admin-page admin-page-inner">
-      <div className="container">
-        <AdminNav />
-        <div className="admin-top">
-          <div>
-            <p className="kicker">CARVENTORY / INVENTORY</p>
-            <h1>Manage your <em>collection.</em></h1>
-          </div>
-          <Button to="/admin/cars/new" icon="arrow">Add a car</Button>
+    <div className="container" style={{ paddingTop: '20px', paddingBottom: '40px' }}>
+      <AdminNav />
+
+      {/* Header & Add Button */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '12px',
+          marginBottom: '20px'
+        }}
+      >
+        <div>
+          <h1>Car Inventory Management</h1>
+          <p className="subtext" style={{ margin: 0 }}>
+            Perform CRUD operations on dealership database ({cars.length} cars total)
+          </p>
         </div>
-
-        {actionStatus && <div className="admin-status-banner">{actionStatus}</div>}
-        {actionError && <div className="admin-error-banner">{actionError}</div>}
-
-        <div className="inventory-toolbar">
-          <label>
-            <Icon name="search" size={17} />
-            <input
-              value={query}
-              onChange={event => setQuery(event.target.value)}
-              placeholder="Search cars, models or locations"
-            />
-          </label>
-          <span>{cars.length} total cars</span>
-        </div>
-
-        {loading ? (
-          <div className="admin-empty">Loading cars...</div>
-        ) : error ? (
-          <div className="admin-error-banner">Unable to load cars. Please try again.</div>
-        ) : filteredCars.length === 0 ? (
-          <div className="admin-empty">No cars found.</div>
-        ) : (
-          <div className="admin-inventory-list">
-            {filteredCars.map(car => (
-              <div className="admin-inventory-row" key={car.id}>
-                <img src={car.image} alt={`${car.brand} ${car.model}`} />
-                <div>
-                  <strong>{car.brand} {car.model}</strong>
-                  <span>{car.year} · {car.variant} · {formatPrice(car.price)}</span>
-                </div>
-                <select
-                  className={`admin-status-select ${car.status.toLowerCase()}`}
-                  value={car.status}
-                  onChange={event => updateCarStatus(car.id, event.target.value)}
-                  aria-label={`Status for ${car.brand} ${car.model}`}
-                >
-                  {['AVAILABLE', 'RESERVED', 'SOLD', 'HIDDEN'].map(status => (
-                    <option key={status} value={status}>{status}</option>
-                  ))}
-                </select>
-                <Link to={`/admin/cars/${car.id}/edit`} className="table-action">Edit</Link>
-                <button
-                  className="table-action delete-action"
-                  onClick={() => remove(car.id, `${car.brand} ${car.model}`)}
-                >
-                  Delete
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+        <Link to="/admin/cars/new" className="btn btn-primary">
+          + Add New Car
+        </Link>
       </div>
+
+      {actionStatus && (
+        <div className="status-banner status-banner-info">{actionStatus}</div>
+      )}
+      {actionError && (
+        <div className="status-banner status-banner-error">{actionError}</div>
+      )}
+
+      {/* Search Toolbar */}
+      <div
+        className="card"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '12px',
+          padding: '12px 16px',
+          marginBottom: '20px'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, maxWidth: '400px' }}>
+          <input
+            type="text"
+            className="form-input"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search by brand, model, or location..."
+            style={{ width: '100%' }}
+          />
+        </div>
+        <span style={{ fontSize: '13px', color: '#64748b' }}>
+          Showing {filteredCars.length} of {cars.length} vehicles
+        </span>
+      </div>
+
+      {/* CRUD Table */}
+      {loading ? (
+        <div className="card" style={{ padding: '30px', textAlign: 'center' }}>
+          <p style={{ margin: 0, color: '#64748b' }}>Loading inventory...</p>
+        </div>
+      ) : error ? (
+        <div className="status-banner status-banner-error">
+          Unable to load inventory. Please ensure the backend is running.
+        </div>
+      ) : filteredCars.length === 0 ? (
+        <div className="card" style={{ padding: '30px', textAlign: 'center' }}>
+          <p style={{ margin: 0, color: '#64748b' }}>No cars found matching your search.</p>
+        </div>
+      ) : (
+        <div className="table-wrap">
+          <table className="table">
+            <thead>
+              <tr>
+                <th style={{ width: '60px' }}>Image</th>
+                <th>Car Details</th>
+                <th>Price</th>
+                <th>Specs</th>
+                <th style={{ width: '130px' }}>Status</th>
+                <th style={{ width: '140px' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredCars.map((car) => (
+                <tr key={car.id}>
+                  <td>
+                    <img
+                      src={car.image || 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=100&q=80'}
+                      alt=""
+                      style={{ width: '48px', height: '36px', objectFit: 'cover', borderRadius: '3px' }}
+                    />
+                  </td>
+                  <td>
+                    <strong>{car.brand} {car.model}</strong>
+                    <div style={{ fontSize: '12px', color: '#64748b' }}>
+                      {car.year} · {car.variant}
+                    </div>
+                  </td>
+                  <td>
+                    <strong style={{ color: '#2563eb' }}>{formatPrice(car.price)}</strong>
+                  </td>
+                  <td style={{ fontSize: '12px', color: '#475569' }}>
+                    {car.fuel} · {car.transmission}
+                    <div style={{ color: '#64748b' }}>{car.location}</div>
+                  </td>
+                  <td>
+                    <select
+                      className="form-select"
+                      style={{ padding: '4px 6px', fontSize: '12px', width: 'auto' }}
+                      value={car.status}
+                      onChange={(e) => updateCarStatus(car.id, e.target.value)}
+                    >
+                      <option value="AVAILABLE">AVAILABLE</option>
+                      <option value="RESERVED">RESERVED</option>
+                      <option value="SOLD">SOLD</option>
+                      <option value="HIDDEN">HIDDEN</option>
+                    </select>
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      <Link
+                        to={`/admin/cars/${car.id}/edit`}
+                        className="btn btn-sm btn-outline"
+                      >
+                        Edit
+                      </Link>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline"
+                        style={{ color: '#dc2626' }}
+                        onClick={() => remove(car.id, `${car.brand} ${car.model}`)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   )
 }

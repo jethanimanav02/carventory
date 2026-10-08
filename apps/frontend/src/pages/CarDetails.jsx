@@ -1,7 +1,5 @@
 import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import Button from '../components/Button'
-import Icon from '../components/Icons'
 import CarCard from '../components/CarCard'
 import { formatNumber, formatPrice } from '../data/cars'
 import { useCarsContext } from '../context/CarContext'
@@ -15,9 +13,211 @@ export default function CarDetails() {
   const { addRecentlyViewed } = useRecentlyViewed(publicCars)
   const { toggleFavourite, isFavourite } = useFavouritesContext()
   const { toggleCompare, isComparing } = useCompareContext()
-  const car = publicCars.find(item => String(item.id) === String(carId)) || (publicCars.length > 0 && !carId ? publicCars[0] : null)
-  useEffect(() => { if (car) addRecentlyViewed(car.id) }, [car?.id, addRecentlyViewed])
-  if (loading) return <div className="api-state container"><h1>Loading car details...</h1></div>
-  if (!car) return <div className="empty-page container"><h1>No car found.</h1><Link to="/cars" className="text-link">Back to inventory <Icon name="arrow" size={16} /></Link></div>
-  return <div className="detail-page"><div className="container breadcrumbs"><Link to="/cars">Inventory</Link><span>/</span><span>{car.brand} {car.model}</span></div><section className="container detail-grid"><div className="detail-gallery"><img src={car.image} alt={`${car.brand} ${car.model}`} /><div className="gallery-label">01 / 04 <span>VIEW GALLERY</span></div></div><div className="detail-info"><p className="eyebrow">{car.year} · {car.condition} · {car.status}</p><h1>{car.brand}<br /><em>{car.model}.</em></h1><p className="detail-variant">{car.variant}</p><div className="detail-price"><strong>{formatPrice(car.price)}</strong><span>or ₹24,500 / month<br />with Carventory Finance</span></div><div className="detail-spec-grid"><span><Icon name="gauge" />{formatNumber(car.kmDriven)} km</span><span><Icon name="fuel" />{car.fuel}</span><span><Icon name="calendar" />{car.year}</span><span><Icon name="bolt" />{car.transmission}</span></div><div className="detail-actions"><Button icon="arrow">Book a test drive</Button><Button variant="outline" onClick={() => toggleFavourite(car.id)}>{isFavourite(car.id) ? 'Saved' : 'Save car'}</Button><Button variant="outline" onClick={() => toggleCompare(car.id)}>{isComparing(car.id) ? 'Compared' : 'Compare'}</Button></div><p className="detail-location"><Icon name="map" size={18} /> Available at <strong>{car.location}</strong></p></div></section><section className="container details-lower"><div><p className="eyebrow">THE DETAILS</p><h2>Good to know.</h2><p className="body-copy">{car.description} Every Carventory car includes a 7-day return promise and a complete inspection report.</p></div><div className="features-list">{car.features.map(feature => <span key={feature}><Icon name="check" size={17} />{feature}</span>)}</div></section><section className="container related-section"><div className="section-heading"><div><p className="eyebrow">YOU MAY ALSO LIKE</p><h2>Keep looking.</h2></div></div><div className="car-grid">{publicCars.filter(item => item.id !== car.id).slice(0, 3).map(item => <CarCard key={item.id} car={item} />)}</div></section></div>
+
+  const car = publicCars.find((item) => String(item.id) === String(carId))
+
+  useEffect(() => {
+    if (car) addRecentlyViewed(car.id)
+  }, [car?.id, addRecentlyViewed])
+
+  if (loading) {
+    return (
+      <div className="container" style={{ padding: '40px 16px', textAlign: 'center' }}>
+        <h2>Loading car details...</h2>
+      </div>
+    )
+  }
+
+  if (!car) {
+    return (
+      <div className="container" style={{ padding: '40px 16px', textAlign: 'center' }}>
+        <h2>Car not found</h2>
+        <p className="subtext">The requested vehicle could not be found in the inventory.</p>
+        <Link to="/cars" className="btn btn-primary">
+          Back to Inventory
+        </Link>
+      </div>
+    )
+  }
+
+  const fav = isFavourite(car.id)
+  const comparing = isComparing(car.id)
+  const similarCars = publicCars.filter((item) => item.id !== car.id).slice(0, 3)
+
+  return (
+    <div className="container" style={{ paddingTop: '16px', paddingBottom: '40px' }}>
+      {/* Breadcrumb */}
+      <nav className="breadcrumb">
+        <Link to="/">Home</Link>
+        <span>/</span>
+        <Link to="/cars">Cars</Link>
+        <span>/</span>
+        <span>{car.brand} {car.model}</span>
+      </nav>
+
+      {/* Main Details Grid */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+          gap: '24px',
+          marginBottom: '28px'
+        }}
+      >
+        {/* Car Image */}
+        <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
+          <img
+            src={car.image || 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=800&q=80'}
+            alt={`${car.brand} ${car.model}`}
+            style={{ width: '100%', height: '320px', objectFit: 'cover' }}
+          />
+          <div style={{ padding: '12px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <span className="badge badge-available">{car.status}</span>
+            <span className="badge" style={{ backgroundColor: '#f1f5f9', color: '#475569' }}>{car.condition}</span>
+            <span style={{ fontSize: '13px', color: '#64748b', marginLeft: 'auto' }}>
+              📍 {car.location}
+            </span>
+          </div>
+        </div>
+
+        {/* Car Specs Info Card */}
+        <div className="card">
+          <div style={{ fontSize: '13px', color: '#64748b', fontWeight: 600 }}>{car.brand}</div>
+          <h1 style={{ fontSize: '24px', marginBottom: '4px' }}>
+            {car.brand} {car.model}
+          </h1>
+          <div className="subtext" style={{ marginBottom: '12px' }}>{car.variant}</div>
+
+          <div
+            style={{
+              fontSize: '22px',
+              fontWeight: 700,
+              color: '#2563eb',
+              padding: '10px 0',
+              borderTop: '1px solid #e2e8f0',
+              borderBottom: '1px solid #e2e8f0',
+              marginBottom: '16px'
+            }}
+          >
+            {formatPrice(car.price)}
+          </div>
+
+          {/* Key Specs Table */}
+          <table className="table" style={{ fontSize: '13px', marginBottom: '16px' }}>
+            <tbody>
+              <tr>
+                <td style={{ color: '#64748b', width: '40%' }}>Year of Make</td>
+                <td><strong>{car.year}</strong></td>
+              </tr>
+              <tr>
+                <td style={{ color: '#64748b' }}>Kilometres Driven</td>
+                <td><strong>{formatNumber(car.kmDriven)} km</strong></td>
+              </tr>
+              <tr>
+                <td style={{ color: '#64748b' }}>Fuel Type</td>
+                <td><strong>{car.fuel}</strong></td>
+              </tr>
+              <tr>
+                <td style={{ color: '#64748b' }}>Transmission</td>
+                <td><strong>{car.transmission}</strong></td>
+              </tr>
+              {car.engine && (
+                <tr>
+                  <td style={{ color: '#64748b' }}>Engine</td>
+                  <td><strong>{car.engine}</strong></td>
+                </tr>
+              )}
+              {car.color && (
+                <tr>
+                  <td style={{ color: '#64748b' }}>Color</td>
+                  <td><strong>{car.color}</strong></td>
+                </tr>
+              )}
+              <tr>
+                <td style={{ color: '#64748b' }}>Number of Owners</td>
+                <td><strong>{car.owners || 1}</strong></td>
+              </tr>
+              {car.registrationNumber && (
+                <tr>
+                  <td style={{ color: '#64748b' }}>Registration Number</td>
+                  <td><strong>{car.registrationNumber}</strong></td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+
+          {/* Action Buttons */}
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              className={`btn ${fav ? 'btn-secondary' : 'btn-outline'}`}
+              onClick={() => toggleFavourite(car.id)}
+            >
+              {fav ? '♥ Saved in Favourites' : '♡ Add to Favourites'}
+            </button>
+            <button
+              type="button"
+              className={`btn ${comparing ? 'btn-secondary' : 'btn-outline'}`}
+              onClick={() => toggleCompare(car.id)}
+            >
+              {comparing ? 'Added to Compare ✓' : '+ Compare'}
+            </button>
+            <Link to="/cars" className="btn btn-primary" style={{ marginLeft: 'auto' }}>
+              Back to Inventory
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Description & Features Section */}
+      <div className="card" style={{ marginBottom: '28px' }}>
+        <h3>Vehicle Description</h3>
+        <p style={{ color: '#475569', fontSize: '14px', lineHeight: 1.6, marginBottom: '20px' }}>
+          {car.description || 'No additional description provided for this vehicle.'}
+        </p>
+
+        {car.features && car.features.length > 0 && (
+          <div>
+            <h3>Key Features</h3>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '10px' }}>
+              {car.features.map((feature) => (
+                <span
+                  key={feature}
+                  style={{
+                    backgroundColor: '#f1f5f9',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '4px',
+                    padding: '4px 10px',
+                    fontSize: '13px',
+                    color: '#334155'
+                  }}
+                >
+                  ✓ {feature}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Similar Cars */}
+      {similarCars.length > 0 && (
+        <section>
+          <h2>Similar Cars in Inventory</h2>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: '16px',
+              marginTop: '12px'
+            }}
+          >
+            {similarCars.map((item) => (
+              <CarCard key={item.id} car={item} />
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  )
 }

@@ -1,24 +1,58 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import Button from './Button'
-import Icon from './Icons'
 import { useAuth } from '../context/AuthContext'
-
-const navItems = [['Cars', '/cars'], ['Compare', '/compare'], ['Favourites', '/favourites']]
 
 export default function Navbar({ favouriteCount = 0, compareCount = 0 }) {
   const [open, setOpen] = useState(false)
-  const { isAuthenticated } = useAuth()
-  return <header className="site-header">
-    <div className="container nav-inner">
-      <Link to="/" className="brand" onClick={() => setOpen(false)}><span className="brand-mark">C</span><span>carventory<span className="brand-dot">.</span></span></Link>
-      <nav className={`nav-links ${open ? 'nav-open' : ''}`}>
-        {navItems.map(([label, path]) => <NavLink key={path} to={path} onClick={() => setOpen(false)} className={({ isActive }) => isActive ? 'active' : ''}>{label}{path === '/compare' && compareCount > 0 ? ` (${compareCount})` : ''}{path === '/favourites' && favouriteCount > 0 ? ` (${favouriteCount})` : ''}</NavLink>)}
-        <span className="nav-divider" />
-        <NavLink to="/admin" onClick={() => setOpen(false)} className="admin-link">Admin {isAuthenticated && <span className="arrow-up">↗</span>}</NavLink>
-        <Button to="/login" variant="outline" className="nav-login">Sign in</Button>
-      </nav>
-      <button className="menu-button" onClick={() => setOpen(!open)} aria-label="Toggle navigation"><Icon name={open ? 'close' : 'menu'} /></button>
-    </div>
-  </header>
+  const { isAuthenticated, logout } = useAuth()
+
+  return (
+    <header className="site-navbar">
+      <div className="container nav-container">
+        <Link to="/" className="nav-brand" onClick={() => setOpen(false)}>
+          <span>Carventory</span>
+          <span className="brand-tag">B.Tech Project</span>
+        </Link>
+
+        <nav className={`nav-menu ${open ? 'open' : ''}`}>
+          <NavLink to="/" onClick={() => setOpen(false)} className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+            Home
+          </NavLink>
+          <NavLink to="/cars" onClick={() => setOpen(false)} className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+            Cars
+          </NavLink>
+          <NavLink to="/compare" onClick={() => setOpen(false)} className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+            Compare {compareCount > 0 && <span className="nav-count">{compareCount}</span>}
+          </NavLink>
+          <NavLink to="/favourites" onClick={() => setOpen(false)} className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+            Favourites {favouriteCount > 0 && <span className="nav-count">{favouriteCount}</span>}
+          </NavLink>
+          <NavLink to="/admin" onClick={() => setOpen(false)} className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+            Admin
+          </NavLink>
+
+          {isAuthenticated ? (
+            <button
+              onClick={() => { logout(); setOpen(false) }}
+              className="btn btn-outline btn-sm"
+            >
+              Sign out
+            </button>
+          ) : (
+            <Link to="/login" onClick={() => setOpen(false)} className="btn btn-primary btn-sm">
+              Login
+            </Link>
+          )}
+        </nav>
+
+        <button
+          className="nav-toggle"
+          onClick={() => setOpen(!open)}
+          aria-label="Toggle navigation menu"
+        >
+          {open ? '✕' : '☰'}
+        </button>
+      </div>
+    </header>
+  )
 }

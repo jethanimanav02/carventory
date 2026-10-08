@@ -1,22 +1,132 @@
 import { Link } from 'react-router-dom'
-import Button from '../components/Button'
 import CarCard from '../components/CarCard'
-import Icon from '../components/Icons'
 import SearchPanel from '../components/SearchPanel'
 import { useCarsContext } from '../context/CarContext'
 
 export default function Home() {
   const { publicCars, loading, error } = useCarsContext()
   const featuredCars = publicCars.slice(0, 3)
-  if (loading) return <ApiState title="Loading the collection." message="Connecting to the Carventory inventory." />
-  if (error) return <ApiState title="Inventory is offline." message="Start the Spring Boot backend to load live cars from the API." />
-  return <>
-    <section className="hero"><div className="hero-orbit hero-orbit-one" /><div className="hero-orbit hero-orbit-two" /><div className="container hero-content"><p className="kicker">THE CARVENTORY EDIT · 2026</p><h1>Find a car<br /><em>worth keeping.</em></h1><p className="hero-subtitle">A thoughtfully selected collection of inspected cars,<br className="desktop-only" /> ready for wherever you’re going next.</p><SearchPanel /><div className="hero-note"><span className="pulse-dot" /> 42 cars available today <span className="note-rule" /> Free home test drives in Hyderabad</div></div><div className="hero-car-caption">01 / 04 <span>FEATURED COLLECTION</span></div></section>
-    <section className="section container featured-section"><div className="section-heading"><div><p className="eyebrow">JUST IN</p><h2>Cars with a little <em>more.</em></h2></div><Link to="/cars" className="text-link">View all inventory <Icon name="arrow" size={17} /></Link></div><div className="car-grid">{featuredCars.map(car => <CarCard key={car.id} car={car} featured />)}</div></section>
-    <section className="manifesto"><div className="container manifesto-grid"><div><p className="eyebrow">THE CARVENTORY PROMISE</p><h2>Buy with clarity.<br /><em>Drive with confidence.</em></h2></div><div className="manifesto-copy"><p>Every car in our collection earns its place. We inspect the details, tell you the whole story, and leave room for the right choice to feel simple.</p><Button to="/cars" variant="dark" icon="arrow">Explore the collection</Button></div></div></section>
-    <section className="section container way-section"><div className="section-heading"><div><p className="eyebrow">A BETTER WAY TO SHOP</p><h2>Less browsing.<br /><em>More belonging.</em></h2></div></div><div className="way-grid"><div className="way-card way-card-large"><span className="way-number">01</span><Icon name="check" size={27} /><h3>Inspected, honestly</h3><p>200+ checkpoints, a transparent history and no awkward surprises after you arrive.</p></div><div className="way-card"><span className="way-number">02</span><Icon name="calendar" size={27} /><h3>Take your time</h3><p>Book a home test drive or visit us. Your decision should never feel rushed.</p></div><div className="way-card"><span className="way-number">03</span><Icon name="bolt" size={27} /><h3>Ready to go</h3><p>Paperwork handled, cars serviced and a seven-day return promise included.</p></div></div></section>
-    <section className="cta-strip"><div className="container cta-inner"><div><p className="eyebrow">NOT SURE WHERE TO START?</p><h2>Let’s find your<br /><em>right fit.</em></h2></div><Button to="/cars" variant="light" icon="arrow">Browse all cars</Button></div></section>
-  </>
-}
 
-function ApiState({ title, message }) { return <div className="api-state container"><p className="kicker">CARVENTORY / LIVE INVENTORY</p><h1>{title}</h1><p>{message}</p><Link to="/cars" className="text-link">Try inventory <Icon name="arrow" size={16} /></Link></div> }
+  return (
+    <div className="container" style={{ paddingTop: '24px', paddingBottom: '40px' }}>
+      {/* Student Project Landing Banner */}
+      <section
+        className="card"
+        style={{
+          backgroundColor: '#ffffff',
+          padding: '32px 24px',
+          marginBottom: '28px',
+          borderLeft: '4px solid #2563eb'
+        }}
+      >
+        <span className="badge badge-available" style={{ marginBottom: '10px' }}>
+          College Practical Project
+        </span>
+        <h1 style={{ fontSize: '24px', marginBottom: '8px' }}>
+          Car Inventory Management System
+        </h1>
+        <p className="subtext" style={{ maxWidth: '640px', marginBottom: '16px' }}>
+          A full-stack web application developed to explore, search, compare, and manage
+          used and new car inventory for dealership operations.
+        </p>
+
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <Link to="/cars" className="btn btn-primary">
+            Browse All Cars ({publicCars.length})
+          </Link>
+          <Link to="/admin" className="btn btn-outline">
+            Admin Dashboard
+          </Link>
+        </div>
+
+        {/* Search Panel */}
+        <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #f1f5f9' }}>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>
+            Quick Search
+          </div>
+          <SearchPanel />
+        </div>
+      </section>
+
+      {/* Featured Inventory Section */}
+      <section style={{ marginBottom: '32px' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '16px'
+          }}
+        >
+          <div>
+            <h2>Featured Inventory</h2>
+            <p className="subtext" style={{ margin: 0 }}>
+              Recently listed vehicles available in the database.
+            </p>
+          </div>
+          <Link to="/cars" className="btn btn-outline btn-sm">
+            View All ({publicCars.length}) →
+          </Link>
+        </div>
+
+        {loading ? (
+          <div className="card" style={{ textAlign: 'center', padding: '30px' }}>
+            <p style={{ margin: 0, color: '#64748b' }}>Loading cars from database...</p>
+          </div>
+        ) : error ? (
+          <div className="status-banner status-banner-error">
+            Unable to load cars. Make sure the backend server is running.
+          </div>
+        ) : featuredCars.length === 0 ? (
+          <div className="card" style={{ textAlign: 'center', padding: '30px' }}>
+            <p style={{ margin: 0, color: '#64748b' }}>No cars currently available in inventory.</p>
+          </div>
+        ) : (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '16px'
+            }}
+          >
+            {featuredCars.map((car) => (
+              <CarCard key={car.id} car={car} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Project Modules Overview (College Project Context) */}
+      <section>
+        <h2>Project Features</h2>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gap: '16px',
+            marginTop: '12px'
+          }}
+        >
+          <div className="card">
+            <h3>Search & Filtering</h3>
+            <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>
+              Search across brand, model, and location with multi-attribute filtering for fuel type, transmission, condition, and price range.
+            </p>
+          </div>
+          <div className="card">
+            <h3>Vehicle Comparison</h3>
+            <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>
+              Side-by-side spec comparison table for up to 3 selected vehicles to evaluate price, mileage, and features.
+            </p>
+          </div>
+          <div className="card">
+            <h3>Admin Inventory CRUD</h3>
+            <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>
+              Admin management portal with real-time add, update, delete, and listing status management backed by MongoDB.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+  )
+}

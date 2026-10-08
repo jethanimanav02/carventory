@@ -1,9 +1,64 @@
-export default function FormField({ label, name, value, onChange, error, type = 'text', options, placeholder, required = false, min, max, step, rows }) {
-  return <label className={`form-field ${error ? 'has-error' : ''}`}>
-    <span>{label}{required && <b>*</b>}</span>
-    {options ? <select name={name} value={value} onChange={onChange}><option value="">Select {label.toLowerCase()}</option>{options.map(option => <option value={option} key={option}>{option}</option>)}</select>
-      : rows ? <textarea name={name} value={value} onChange={onChange} placeholder={placeholder} rows={rows} />
-      : <input name={name} type={type} value={value} onChange={onChange} placeholder={placeholder} min={min} max={max} step={step} />}
-    {error && <small>{error}</small>}
-  </label>
+export default function FormField({
+  label,
+  name,
+  value,
+  onChange,
+  error,
+  type = 'text',
+  options,
+  placeholder,
+  required = false,
+  min,
+  max,
+  step,
+  rows
+}) {
+  return (
+    <div className="form-group">
+      <label className="form-label" htmlFor={name}>
+        {label}
+        {required && <b>*</b>}
+      </label>
+      {options ? (
+        <select
+          id={name}
+          name={name}
+          value={value}
+          onChange={onChange}
+          className="form-select"
+        >
+          <option value="">Select {label.toLowerCase()}</option>
+          {options.map((option) => (
+            <option value={option} key={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      ) : rows ? (
+        <textarea
+          id={name}
+          name={name}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          rows={rows}
+          className="form-textarea"
+        />
+      ) : (
+        <input
+          id={name}
+          name={name}
+          type={type}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          min={min}
+          max={max}
+          step={step}
+          className="form-input"
+        />
+      )}
+      {error && <div className="form-error">{error}</div>}
+    </div>
+  )
 }

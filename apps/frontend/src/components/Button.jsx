@@ -1,8 +1,28 @@
 import { Link } from 'react-router-dom'
-import Icon from './Icons'
 
-export default function Button({ children, to, variant = 'primary', icon, className = '', type = 'button', ...props }) {
-  const classes = `button button-${variant} ${className}`
-  const content = <>{children}{icon && <Icon name={icon} size={17} />}</>
-  return to ? <Link className={classes} to={to} {...props}>{content}</Link> : <button className={classes} type={type} {...props}>{content}</button>
+export default function Button({
+  children,
+  to,
+  variant = 'primary',
+  className = '',
+  type = 'button',
+  ...props
+}) {
+  let btnClass = 'btn-primary'
+  if (variant === 'outline') btnClass = 'btn-outline'
+  else if (variant === 'secondary' || variant === 'light') btnClass = 'btn-secondary'
+  else if (variant === 'danger') btnClass = 'btn-danger'
+  else if (variant === 'dark') btnClass = 'btn-primary'
+
+  const classes = `btn ${btnClass} ${className}`.trim()
+
+  return to ? (
+    <Link className={classes} to={to} {...props}>
+      {children}
+    </Link>
+  ) : (
+    <button className={classes} type={type} {...props}>
+      {children}
+    </button>
+  )
 }

@@ -1,4 +1,71 @@
 import { Link } from 'react-router-dom'
-import Icon from '../components/Icons'
 
-export default function Register() { return <div className="auth-page"><div className="auth-aside"><Link to="/" className="brand"><span className="brand-mark">C</span><span>carventory<span className="brand-dot">.</span></span></Link><div><p className="kicker">YOUR NEXT CHAPTER</p><h1>Make room<br /><em>for more.</em></h1></div><span className="auth-aside-foot">© 2026 Carventory</span></div><div className="auth-form-wrap"><Link to="/" className="mobile-auth-logo"><span className="brand-mark">C</span> carventory<span className="brand-dot">.</span></Link><div className="auth-form"><p className="eyebrow">JOIN CARVENTORY</p><h2>Create an<br /><em>account.</em></h2><p className="auth-subtitle">Save cars, compare favourites and pick up right where you left off.</p><form onSubmit={event => event.preventDefault()}><label>Full name<input placeholder="Your name" /></label><label>Email address<input type="email" placeholder="you@example.com" /></label><label>Password<input type="password" placeholder="Create a password" /></label><button className="button button-primary auth-submit" type="submit">Create account <Icon name="arrow" size={17} /></button></form><p className="auth-footer">Already have an account? <Link to="/login">Sign in</Link></p></div></div></div> }
+export default function Register() {
+  const submit = (event) => {
+    event.preventDefault()
+  }
+
+  return (
+    <div className="container" style={{ paddingTop: '50px', paddingBottom: '60px' }}>
+      <div className="card" style={{ maxWidth: '400px', margin: '0 auto', padding: '28px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+          <h1 style={{ fontSize: '22px', marginBottom: '4px' }}>Register Account</h1>
+          <p className="subtext" style={{ margin: 0 }}>
+            Create an account to save and compare cars
+          </p>
+        </div>
+
+        <form onSubmit={submit}>
+          <div className="form-group">
+            <label className="form-label" htmlFor="reg-name">Full Name</label>
+            <input
+              id="reg-name"
+              type="text"
+              className="form-input"
+              placeholder="e.g. Rahul Sharma"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="reg-email">Email Address</label>
+            <input
+              id="reg-email"
+              type="email"
+              className="form-input"
+              placeholder="you@example.com"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="reg-password">Password</label>
+            <input
+              id="reg-password"
+              type="password"
+              className="form-input"
+              placeholder="At least 6 characters"
+              required
+            />
+          </div>
+
+          <button type="submit" className="btn btn-primary" style={{ width: '100%', marginBottom: '16px' }}>
+            Create Account
+          </button>
+        </form>
+
+        <div style={{ textAlign: 'center', fontSize: '13px', borderTop: '1px solid #e2e8f0', paddingTop: '14px' }}>
+          <span>Already have an account? </span>
+          <Link to="/login" style={{ color: '#2563eb', fontWeight: 500 }}>
+            Sign in
+          </Link>
+          <div style={{ marginTop: '8px' }}>
+            <Link to="/" style={{ color: '#64748b' }}>
+              ← Back to Home
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
